@@ -1,9 +1,13 @@
-name: Playwright Tests
+name: Banking Example Automation Playwright Tests
+
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  schedule:
+    - cron: '0 12 * * *'  # Runs every day at 12:00 UTC
+
 jobs:
   test:
     timeout-minutes: 60
@@ -24,4 +28,4 @@ jobs:
       with:
         name: playwright-report
         path: playwright-report/
-        retention-days: 30
+        retention-days: 1
