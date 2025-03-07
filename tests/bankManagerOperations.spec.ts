@@ -1,8 +1,7 @@
 import { expect, test } from '../fixtures/fixtures.ts';
 import { correctCredentials } from '../data/customerData.ts';
-import { get } from 'http';
 import { getValidationMessage } from '../utils/helpers/getValidationMessage.ts';
-import { browserMessage } from '../data/browserFieldMessaging.ts';
+import { customerFieldValidationMessage } from '../data/customerFieldsValidation.ts';
 
 test.describe('Jira 1: Create a customer', () => {
   const { name, lastName, postCode } = correctCredentials; //test customer credentials 
@@ -16,7 +15,7 @@ test.describe('Jira 1: Create a customer', () => {
     await manager.clickAddCustomerButton();
     const message = await getValidationMessage(manager.addCustomerSection.firstNameField);
     
-    const expectedMessage = browserMessage[browserName];
+    const expectedMessage = customerFieldValidationMessage[browserName];
     expect(message).toBe(expectedMessage);
   });
 
@@ -26,7 +25,7 @@ test.describe('Jira 1: Create a customer', () => {
     await manager.enterCustomerCredentials(name);
     const message = await getValidationMessage(manager.addCustomerSection.lastNameField);
   
-    const expectedMessage = browserMessage[browserName];
+    const expectedMessage = customerFieldValidationMessage[browserName];
     expect(message).toBe(expectedMessage);
   });
 
@@ -36,7 +35,7 @@ test.describe('Jira 1: Create a customer', () => {
     await manager.enterCustomerCredentials(name, lastName);
     const message = await getValidationMessage(manager.addCustomerSection.postCodeField);
 
-    const expectedMessage = browserMessage[browserName];
+    const expectedMessage = customerFieldValidationMessage[browserName];
     expect(message).toBe(expectedMessage);
   });
 
@@ -80,8 +79,6 @@ test('Verify duplicate customer cannot be created.', async ({page, manager },tes
 
   expect(dialogMessage).toEqual('Please check the details. Customer may be duplicate.');
 })
-
-
 });
 
 test.describe('Jira 2: Open an account', () => {
@@ -110,19 +107,26 @@ test.describe('Jira 2: Open an account', () => {
     expect(dialogMessage).toEqual('Account created successfully with account Number :1016');
   });
 
-  test('Verify customer record has new accout number.', async ({ page, manager }) => {
+  test('Verify customer record has new account number.', async ({ page, manager }) => {
     await manager.selectOpenAccountTab();
     await manager.selectUser('Harry Potter');
     await manager.selectCurrency('Pound');
+
+    let dialogMessage: string = '';
     page.on('dialog', async dialog => {
+      dialogMessage = dialog.message();
       await dialog.accept();
     });
     await manager.clickProcessAccount();
 
+    const accountNumber = dialogMessage.match(/\d+/)?.[0];
+ 
+
+
+    await manager.selectCustomerTab();
+    await manager.searchForCustomer(accountNumber);
+    const retrievedCustomerRecords = await manager.getQueriedTableData();
+    expect(retrievedCustomerRecords).toContainEqual({ name: 'Harry', lastName: 'Potter', postCode: 'E725JB', accountNumber: `1004 1005 1006 ${accountNumber}` });  
   });
   
-
-
-
-
 });

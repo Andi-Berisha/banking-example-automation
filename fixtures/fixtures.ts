@@ -1,10 +1,12 @@
 import { test as base } from "@playwright/test";
 import HomePage from "../pages/homePage";
 import ManagerPage from "../pages/managerPage";
+import CustomerPage from "../pages/customerPage";
 
 type CustomFixtures = {
     home: HomePage,
     manager: ManagerPage,
+    customer: CustomerPage,
 }
 
 export const test = base.extend<CustomFixtures>({
@@ -29,7 +31,12 @@ export const test = base.extend<CustomFixtures>({
 
     manager: async ({ page }, use) => {
         use(new ManagerPage(page));
-    }
+    },
+
+    customer: async ({ page }, use) => {
+        use(new CustomerPage(page));
+    },
+
 })
 
 export { expect } from '@playwright/test';
