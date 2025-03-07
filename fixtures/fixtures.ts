@@ -20,6 +20,7 @@ export const test = base.extend<CustomFixtures>({
             await use(page);
             //Teardown
             await page.waitForLoadState("load");
+            await page.close();
         }
         , { scope: 'test' },
     ],
